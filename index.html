@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ふぉとまっぷ - 写真と地図をつなぐアプリ</title>
+  <meta name="description" content="ふぉとまっぷは、撮影した写真を地図上に記録・整理できるiOSアプリです。思い出の場所を美しいマップで振り返りましょう。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #21262d;
+      --accent: #58a6ff;
+      --accent2: #f78166;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --radius: 16px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* --- HERO --- */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(88,166,255,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(247,129,102,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-icon {
+      width: 96px;
+      height: 96px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #1f6feb 0%, #388bfd 50%, #58a6ff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      margin-bottom: 32px;
+      box-shadow: 0 0 60px rgba(88,166,255,0.3), 0 8px 32px rgba(0,0,0,0.5);
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.8rem, 8vw, 5rem);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #e6edf3 30%, #58a6ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 40px;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-desc {
+      font-size: 1.15rem;
+      max-width: 520px;
+      color: #adbac7;
+      margin-bottom: 48px;
+      line-height: 1.8;
+    }
+
+    .btn-appstore {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--text);
+      color: var(--bg);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 16px 32px;
+      border-radius: 50px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px rgba(230,237,243,0.15);
+    }
+
+    .btn-appstore:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(230,237,243,0.25);
+    }
+
+    .btn-appstore svg { width: 24px; height: 24px; }
+
+    .version-badge {
+      display: inline-block;
+      background: rgba(88,166,255,0.15);
+      border: 1px solid rgba(88,166,255,0.3);
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 4px 12px;
+      border-radius: 50px;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+
+    /* --- FEATURES --- */
+    .section {
+      padding: 100px 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      line-height: 1.2;
+      margin-bottom: 64px;
+      color: var(--text);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      transition: border-color 0.3s, transform 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(88,166,255,0.4);
+      transform: translateY(-4px);
+    }
+
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* --- DIVIDER --- */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 24px;
+    }
+
+    /* --- CTA --- */
+    .cta-section {
+      text-align: center;
+      padding: 100px 24px;
+    }
+
+    .cta-section h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      margin-bottom: 16px;
+    }
+
+    .cta-section p {
+      color: var(--muted);
+      margin-bottom: 40px;
+      font-size: 1rem;
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    footer p {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: opacity 0.2s;
+    }
+
+    footer a:hover { opacity: 0.7; }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* --- ANIMATIONS --- */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: fadeIn 0.7s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in:nth-child(2) { animation-delay: 0.1s; }
+    .fade-in:nth-child(3) { animation-delay: 0.2s; }
+    .fade-in:nth-child(4) { animation-delay: 0.3s; }
+    .fade-in:nth-child(5) { animation-delay: 0.4s; }
+
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-icon">📍</div>
+    <div class="version-badge fade-in">V2.0 リリース</div>
+    <h1 class="fade-in">ふぉとまっぷ</h1>
+    <p class="hero-sub fade-in">FotoMappu for iOS</p>
+    <p class="hero-desc fade-in">
+      撮影した写真を地図上に自動記録。<br>
+      訪れた場所の思い出を、美しい地図で振り返りましょう。
+    </p>
+    <a class="btn-appstore fade-in" href="https://apps.apple.com/app/id6755569019" target="_blank" rel="noopener">
+      <!-- Apple SVG icon -->
+      <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+      </svg>
+      App Store でダウンロード
+    </a>
+  </section>
+
+  <hr class="divider">
+
+  <!-- FEATURES -->
+  <section class="section">
+    <p class="section-label">Features</p>
+    <h2 class="section-title">ふぉとまっぷの主な機能</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🗺️</span>
+        <h3>写真×地図の自動連携</h3>
+        <p>撮影時のGPS情報を使って、写真を地図上に自動でピン留め。どこで撮ったか一目でわかります。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📸</span>
+        <h3>フォトジャーナル</h3>
+        <p>旅行や日常の写真を場所ごとに整理。時系列と地図の両方で思い出を振り返れます。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔍</span>
+        <h3>場所で検索</h3>
+        <p>「あの場所で撮った写真は？」地名やエリアで素早く写真を絞り込めます。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🌙</span>
+        <h3>ダーク／ライトモード</h3>
+        <p>システム設定に自動で追従。夜間でも目に優しい表示でご利用いただけます。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <h3>プライバシー重視</h3>
+        <p>写真データはデバイス内のみで管理。外部サーバーへの送信は一切ありません。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">✨</span>
+        <h3>V2.0 新機能</h3>
+        <p>UIを全面リニューアル。パフォーマンスを大幅に改善し、より快適にお使いいただけます。</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2>今すぐ無料で試す</h2>
+    <p>App Storeから無料でダウンロードできます。</p>
+    <a class="btn-appstore" href="https://apps.apple.com/app/id6755569019" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+      </svg>
+      App Store でダウンロード
+    </a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 toru-kanno. All rights reserved.</p>
+    <div class="footer-links">
+      <a href="./index.md">プライバシーポリシー</a>
+      <a href="mailto:t-kanno@twise.jp">お問い合わせ</a>
+    </div>
+  </footer>
+
+</body>
+</html>
